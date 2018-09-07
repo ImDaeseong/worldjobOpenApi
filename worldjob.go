@@ -37,19 +37,22 @@ func StripTags(html string) string {
 	return html
 }
 
+func findJobTag(html string) string {
+	first := strings.Index(html, ">")
+	end := strings.LastIndex(html, "<")
+	return string(html[first+1 : end])
+}
+
 func main() {
 
-	//https://www.data.go.kr/dataset/3038249/openapi.do
-
-	spage := "http://www.worldjob.or.kr/openapi/openapi.do?"
-	sdobType := "1"    //1:해외취업,2:해외연수,3:해외인턴,4:해외봉사,5:해외창업
-	sdsptcKsco := "01" //직종별코드(해외취업,연수만 사용)01:전산,컴퓨터,02:전기/전자,06:기계/금속,07:건설/토목,08:사무/서비스,09:의료,10:기타
-	scontinent := "1"  //대륙별코드 1:아시아,2:북아메리카, 3:남아메리카,4:유럽,5:오세아니아,6:아프리카
-	sepmt61 := "Y"     //일자리Best20(해외취업만 사용)Y,N
+	spage := "http://www.worldjob.or.kr/openapi/openapi.do?" ////https://www.data.go.kr/dataset/3038249/openapi.do
+	sdobType := "1"                                          //1:해외취업,2:해외연수,3:해외인턴,4:해외봉사,5:해외창업
+	sdsptcKsco := "01"                                       //직종별코드(해외취업,연수만 사용)01:전산,컴퓨터,02:전기/전자,06:기계/금속,07:건설/토목,08:사무/서비스,09:의료,10:기타
+	scontinent := "1"                                        //대륙별코드 1:아시아,2:북아메리카, 3:남아메리카,4:유럽,5:오세아니아,6:아프리카
+	sepmt61 := "Y"                                           //일자리Best20(해외취업만 사용)Y,N
 	//spageIndex := "10" //페이징숫자
 	sshowItemListCount := "1000" //한번에보여질리스트갯수출력결과
 	sUrl := fmt.Sprintf("%sdobType=%s&dsptcKsco=%s&continent=%s&showItemListCount=%s&sepmt61=%s", spage, sdobType, sdsptcKsco, scontinent, sshowItemListCount, sepmt61)
-	//fmt.Println(sUrl)
 
 	res, err := http.Get(sUrl)
 	if err != nil {
@@ -100,46 +103,21 @@ func main() {
 				continue
 			}
 
-			td1_S := strings.Index(td1[0], ">")
-			td1_E := strings.LastIndex(td1[0], "<")
-
-			td2_S := strings.Index(td2[0], ">")
-			td2_E := strings.LastIndex(td2[0], "<")
-
-			td3_S := strings.Index(td3[0], ">")
-			td3_E := strings.LastIndex(td3[0], "<")
-
-			td4_S := strings.Index(td4[0], ">")
-			td4_E := strings.LastIndex(td4[0], "<")
-
-			td5_S := strings.Index(td5[0], ">")
-			td5_E := strings.LastIndex(td5[0], "<")
-
-			td6_S := strings.Index(td6[0], ">")
-			td6_E := strings.LastIndex(td6[0], "<")
-
-			td7_S := strings.Index(td7[0], ">")
-			td7_E := strings.LastIndex(td7[0], "<")
-
-			td8_S := strings.Index(td8[0], ">")
-			td8_E := strings.LastIndex(td8[0], "<")
-
-			td9_S := strings.Index(td9[0], ">")
-			td9_E := strings.LastIndex(td9[0], "<")
+			td1_sub := findJobTag(td1[0])
+			td2_sub := StripTags(findJobTag(td2[0]))
+			td3_sub := findJobTag(td3[0])
+			td4_sub := findJobTag(td4[0])
+			td5_sub := findJobTag(td5[0])
+			td6_sub := findJobTag(td6[0])
+			td7_sub := findJobTag(td7[0])
+			td8_sub := findJobTag(td8[0])
+			td9_sub := findJobTag(td9[0])
 
 			PageIndex++
 
-			worldJob[PageIndex] = worldJobTag{string(td1[0][td1_S+1 : td1_E]),
-				StripTags(string(td2[0][td2_S+1 : td2_E])),
-				string(td3[0][td3_S+1 : td3_E]),
-				string(td4[0][td4_S+1 : td4_E]),
-				string(td5[0][td5_S+1 : td5_E]),
-				string(td6[0][td6_S+1 : td6_E]),
-				string(td7[0][td7_S+1 : td7_E]),
-				string(td8[0][td8_S+1 : td8_E]),
-				string(td9[0][td9_S+1 : td9_E])}
+			worldJob[PageIndex] = worldJobTag{td1_sub, td2_sub, td3_sub, td4_sub, td5_sub, td6_sub, td7_sub, td8_sub, td9_sub}
 
-			//link := fmt.Sprintf("[%d]%s\r\n %s\r\n %s\r\n %s\r\n %s\r\n %s\r\n %s\r\n %s\r\n %s\r\n", PageIndex, string(td1[0][td1_S+1:td1_E]), StripTags(string(td2[0][td2_S+1:td2_E])), string(td3[0][td3_S+1:td3_E]), string(td4[0][td4_S+1:td4_E]), string(td5[0][td5_S+1:td5_E]), string(td6[0][td6_S+1:td6_E]), string(td7[0][td7_S+1:td7_E]), string(td8[0][td8_S+1:td8_E]), string(td9[0][td9_S+1:td9_E]))
+			//link := fmt.Sprintf("[%d]%s\r\n %s\r\n %s\r\n %s\r\n %s\r\n %s\r\n %s\r\n %s\r\n %s\r\n", PageIndex, td1_sub, td2_sub, td3_sub, td4_sub, td5_sub, td6_sub, td7_sub, td8_sub, td9_sub)
 			//fmt.Println(link)
 		}
 
