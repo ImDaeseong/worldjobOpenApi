@@ -51,7 +51,6 @@ def loadurl_excel():
                                                                                                 sshowItemListCount,
                                                                                                 sepmt61)
     # print(url)
-
     responses = requests.get(url)
     soup = BeautifulSoup(responses.content, 'lxml-xml')
 
